@@ -31,35 +31,36 @@ router.post("/register",(req,res)=>{
     })
  });
 
- //login api 
+//login api 
  
 router.post("/login",(req,res)=>{
     const{email,password,}=req.body;
     if(!password || !email ){
-     return res.status(400).json({error:"one or more mandatory fields are empty"});
+        return res.status(400).json({error:"one or more mandatory fields are empty"});
     }
     UserModel.findOne({email:email})
     .then((userInDB)=>{
-         if(!userInDB){
-           return res.status(401).json({error:"Invalid credentials"});
-     }
-     bcryptjs.compare(password,userInDB.password)
-      .then((didMatch)=>{
-         if(didMatch){
-             const jwtToken=jwt.sign({_id: userInDB._id},JWT_SECRET);
-             const userInfo={"email":userInDB.email,"firstName":userInDB.firstName,"lastName":userInDB.lastName};
-             res.status(200).json({token:jwtToken,user:userInfo});
-         }else{
-             return res.status(401).json({error:"Invalid credentials"});
-         }
+        if(!userInDB){
+            return res.status(401).json({error:"Invalid credentials"});
+        }
+        bcryptjs.compare(password,userInDB.password)
+        .then((didMatch)=>{
+            if(didMatch){
+                const jwtToken=jwt.sign({_id: userInDB._id},JWT_SECRET);
+                const userInfo={"email":userInDB.email,"firstName":userInDB.firstName,"lastName":userInDB.lastName};
+                res.status(200).json({token:jwtToken,user:userInfo});
+            }else{
+                return res.status(401).json({error:"Invalid credentials"});
+            }
+        })
+        .catch((err)=>{
+            console.log(err);
+        });
     })
     .catch((err)=>{
-     console.log(err);
-    })
- })
- .catch((err)=>{
-     console.log(err);
-    })
- });
+        console.log(err);
+    });
+});
+
  module.exports= router;
  
